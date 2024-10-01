@@ -1,9 +1,24 @@
-version: '3'
-
 services:
-  mysql:
+  app:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+    ports:
+      - "8000:8000"
+      - "8080:8080"
+      - "50051:50051"
+    volumes:
+      - .:/app
+    env_file:
+      - env
+    restart: always
+    depends_on:
+      - rabbitmq
+      - db-mysql
+
+  db-mysql:
     image: mysql:5.7
-    container_name: mysql
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
@@ -12,11 +27,10 @@ services:
     ports:
       - 3306:3306
     volumes:
-      - .docker/mysql:/var/lib/mysql
+      - ./sql/migrations:/docker-entrypoint-initdb.d
 
   rabbitmq:
     image: rabbitmq:3-management
-    container_name: rabbitmq
     restart: always
     ports:
       - 5672:5672

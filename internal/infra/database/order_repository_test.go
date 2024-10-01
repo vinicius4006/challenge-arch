@@ -1,10 +1,10 @@
 package database
 
 import (
+	"challenge-arch/internal/entity"
 	"database/sql"
 	"testing"
 
-	"github.com/devfullcycle/20-CleanArch/internal/entity"
 	"github.com/stretchr/testify/suite"
 
 	// sqlite3

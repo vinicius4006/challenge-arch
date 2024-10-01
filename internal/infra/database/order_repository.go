@@ -1,9 +1,8 @@
 package database
 
 import (
+	"challenge-arch/internal/entity"
 	"database/sql"
-
-	"github.com/devfullcycle/20-CleanArch/internal/entity"
 )
 
 type OrderRepository struct {
@@ -26,9 +25,28 @@ func (r *OrderRepository) Save(order *entity.Order) error {
 	return nil
 }
 
+func (r *OrderRepository) List() ([]entity.Order, error) {
+	var list []entity.Order
+	rows, err := r.Db.Query("SELECT * FROM orders")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var order entity.Order
+		if err := rows.Scan(&order.ID, &order.Price, &order.Tax, &order.FinalPrice); err != nil {
+			return nil, err
+		}
+		list = append(list, order)
+	}
+
+	return list, nil
+}
+
 func (r *OrderRepository) GetTotal() (int, error) {
 	var total int
-	err := r.Db.QueryRow("Select count(*) from orders").Scan(&total)
+	err := r.Db.QueryRow("SELECT count(*) FROM orders").Scan(&total)
 	if err != nil {
 		return 0, err
 	}
